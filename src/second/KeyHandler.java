@@ -1,3 +1,5 @@
+package second;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -13,11 +15,8 @@ public class KeyHandler implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
         switch(code){
-            case KeyEvent.VK_SPACE:
+            case KeyEvent.VK_SPACE, KeyEvent.VK_UP:
                 upPressed = true;
-                break;
-            case 7:
-                System.out.println("fdfsdfsd");
                 break;
             default: break;
         }

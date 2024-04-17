@@ -1,3 +1,5 @@
+package second;
+
 import entity.Bird;
 
 import javax.swing.JPanel;
@@ -7,7 +9,7 @@ public class GamePanel extends JPanel implements Runnable {
     final int originalTileSize = 20; // 20x20 tile
     final int scale = 3;
 
-    final int gameTileSize = originalTileSize * scale; // 60x60 tile
+    public final int gameTileSize = originalTileSize * scale; // 60x60 tile
     final int maxGameCol = 20;
     final int maxGameRow = 12;
     final int gameScreenWidth = maxGameCol * gameTileSize; // 60 * 20 = 1200 pixel
@@ -16,7 +18,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
-    Bird gameBird = new Bird();
+    Bird gameBird = new Bird(this, keyH);
     public GamePanel() {
         this.setPreferredSize(new Dimension(gameScreenWidth, gameScreenHeight));
         this.setDoubleBuffered(true);
@@ -57,24 +59,13 @@ public class GamePanel extends JPanel implements Runnable {
 
     public long update(long lastMovementTime) {
         // measure time for regular movement
-        double timeElapsed = (double) (System.nanoTime() - lastMovementTime) / 1000000; // convert to milliseconds;
-        if(timeElapsed > 250L) {
-            if (keyH.upPressed) {
-                gameBird.jump();
-                keyH.upPressed = false;
-            } else {
-                gameBird.move();
-            }
-            return System.nanoTime();
-        }
-        return lastMovementTime;
+        return gameBird.update(lastMovementTime);
     }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        // g2d is our "brash" on the screen
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(gameBird.getXPos(), gameBird.getYPos(), gameTileSize, gameTileSize);
+
+        gameBird.draw(g2d);
         g2d.dispose();
     }
 }
