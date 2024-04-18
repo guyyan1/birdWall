@@ -7,14 +7,12 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Objects;
 
 public class Bird extends Entity{
+    private final int paceAddition = 3;
     private boolean hasCrashed;
     private String movingDirection;
-    private final int gravity = 30;
-    private final int jump_pace = 30;
-    private final int paceAddition = 3;
+    private int directionDeterminer;
     GamePanel gp;
     KeyHandler kh;
     BufferedImage left ,right, jumpingL, jumpingR;
@@ -28,11 +26,24 @@ public class Bird extends Entity{
     }
 
     public void initializeDefaultValues(){
-        xPos = 0;
-        yPos = 0;
-        pace = 60;
+        xPos = 1;
+        yPos = 1;
+        pace = 2;
+        spriteCounter = 10;
         this.hasCrashed = false;
         this.movingDirection = "right";
+        this.directionDeterminer = 1;
+    }
+
+    private void hasReachedWall(){
+        if(xPos + gp.gameTileSize >= gp.gameScreenWidth){
+            this.movingDirection = "left";
+            this.directionDeterminer = -1;
+        }
+        else if(xPos <= 0){
+            this.movingDirection = "right";
+            this.directionDeterminer = 1;
+        }
     }
 
     private void updateBirdPos(int x, int y){
@@ -41,54 +52,83 @@ public class Bird extends Entity{
     }
 
     public void jump(){
-        updateBirdPos(xPos, yPos - jump_pace);
+        int jump_pace = 60;
+        if(yPos - jump_pace >0)
+            updateBirdPos(xPos, yPos - jump_pace);
     }
 
     public void move(){
-        updateBirdPos(xPos + pace, yPos + gravity);
+        int gravity = 1;
+        updateBirdPos(xPos + pace * directionDeterminer, yPos + gravity);
     }
 
     private void increasePace(){
         pace += paceAddition;
     }
 
-    public int getXPos(){
-        return xPos;
-    }
-    public int getYPos(){
-        return yPos;
-    }
+//    public int getXPos(){
+//        return xPos;
+//    }
+//    public int getYPos(){
+//        return yPos;
+//    }
 
     public void getBirdImage(){
         try{
-            right = ImageIO.read(getClass().getClassLoader().getSystemResource("bird/tealBird.png"));
+            right = ImageIO.read(getClass().getClassLoader().getSystemResource("bird/right_b.png"));
+            left = ImageIO.read(getClass().getClassLoader().getSystemResource("bird/left_b.png"));
+            jumpingL = ImageIO.read(getClass().getClassLoader().getSystemResource("bird/jump_left_b.png"));
+            jumpingR = ImageIO.read(getClass().getClassLoader().getSystemResource("bird/jump_right_b.png"));
         }catch(IOException e){
             System.out.println("ERROR: Couldn't read image");
         }
     }
 
-    public long update(long lastMovementTime){
+    public void update(long lastMovementTime){
         // measure time for regular movement
-        double timeElapsed = (double) (System.nanoTime() - lastMovementTime) / 1000000; // convert to milliseconds;
-        if(timeElapsed > 250L) {
+//        double timeElapsed = (double) (System.nanoTime() - lastMovementTime) / 1000000; // convert to milliseconds;
+//        if(timeElapsed > 250L) {
             if (kh.upPressed) {
+                spriteCounter = 0;
                 jump();
+                if(movingDirection.equals("right")){
+                    movingDirection = "right_jump";
+                }else{
+                    movingDirection = "left_jump";
+                }
                 kh.upPressed = false;
             } else {
                 move();
+                if(movingDirection.equals("right_jump")){
+                    movingDirection = "right";
+                }else if(movingDirection.equals("left_jump")){
+                    movingDirection = "left";
+                }
             }
-            return System.nanoTime();
-        }
-        return lastMovementTime;
+            hasReachedWall();
+            spriteCounter++;
+//            return System.nanoTime();
+//        }
+//        return lastMovementTime;
     }
     public void draw(Graphics2D g2d){
         BufferedImage image = null;
         switch(movingDirection){
             case "right":
-                image = right;
+                if(spriteCounter<10){
+                    image = jumpingR;
+                }
+                else {
+                    image = right;
+                }
                 break;
             case "left":
-                image = left;
+                if(spriteCounter<10){
+                    image = jumpingL;
+                }
+                else {
+                    image = left;
+                }
                 break;
             case "right_jump":
                 image = jumpingR;

@@ -12,9 +12,9 @@ public class GamePanel extends JPanel implements Runnable {
     public final int gameTileSize = originalTileSize * scale; // 60x60 tile
     final int maxGameCol = 20;
     final int maxGameRow = 12;
-    final int gameScreenWidth = maxGameCol * gameTileSize; // 60 * 20 = 1200 pixel
-    final int gameScreenHeight = maxGameRow * gameTileSize; // 60 * 12 = 720 pixel
-    final int FPS = 60;
+    public final int gameScreenWidth = maxGameCol * gameTileSize; // 60 * 20 = 1200 pixel
+    public final int gameScreenHeight = maxGameRow * gameTileSize; // 60 * 12 = 720 pixel
+    final int FPS = 30;
 
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
@@ -49,7 +49,7 @@ public class GamePanel extends JPanel implements Runnable {
             lastTime = currentTime;
             if(delta>=1){
                 // ## This loop is responsible for updating characters position and screen
-                currentMovementTime = update(currentMovementTime);
+                update(currentMovementTime);
                 // refresh screen
                 repaint();
                 delta--;
@@ -57,9 +57,9 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    public long update(long lastMovementTime) {
+    public void update(long lastMovementTime) {
         // measure time for regular movement
-        return gameBird.update(lastMovementTime);
+        gameBird.update(lastMovementTime);
     }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
